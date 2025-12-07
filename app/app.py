@@ -1,111 +1,99 @@
 import csv
-from time import sleep
-from PIL import Image, ImageDraw, ImageFont
-import smtplib
 import os
+import smtplib
+from time import sleep
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+from PIL import Image, ImageDraw, ImageFont
 
-class App():
+class CertificateManager:
     def __init__(self):
-        #arguments
-        self.template = "template.png"
-        self.mailList = "list.csv"
-
-        #login configs
-        self.username = "***********"
-        self.password = "**********"
-
-        #mail configs
-        self.subject = "Sertifikanız Hazır"
-        self.message = "Etkinliğimize katıldığınız için teşekkür ederiz. Sertifikanız ektedir."
-
-        #font configs
-        self.font = ImageFont.truetype("PaytoneOne.ttf",60)
-        self.color = 28, 48, 85
-
-        print("configurations are successful")
-
-    def readCSV(self):
-        self.rows = []
-        with open(self.mailList, encoding="utf8") as csvfile:
-            csvreader = csv.reader(csvfile, delimiter=",")
-            for row in csvreader:
-                self.rows.append(row)
-
-    def createCertificate(self, text):
-        img = Image.open(self.template)
-        img_width = img.width
-        img_height = img.height
-
-        draw = ImageDraw.Draw(img)
-        t_width, t_height = draw.textsize(text, self.font)
-        position = ((img_width - t_width)/2, (img_height - t_height)/2-60)
-        draw.text(position, text, self.color, font=self.font)
-        return img
-
-    def prepareCertificates(self):
+        # Default configurations can be overwritten
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.font_path = os.path.join(base_dir, "PaytoneOne.ttf")
+        self.font_size = 60
+        self.font_color = (28, 48, 85)
+        self.template_path = os.path.join(base_dir, "template.png")
+        self.output_dir = os.path.join(base_dir, "certificates")
+        
+    def read_csv(self, file_path):
+        """Reads the CSV file and returns a list of rows."""
+        rows = []
         try:
-            os.mkdir("certificates")
-        except:
-            print("directorry can't generated")
-        for i in self.rows:
-            text = i[1]
-            text = text.upper()
-            certificate = self.createCertificate(text)
-            path = "certificates/{}.png".format(text)
-            certificate.save(path)
-            print("{}.png is created".format(text))
+            with open(file_path, encoding="utf-8") as csvfile:
+                csvreader = csv.reader(csvfile, delimiter=",")
+                for row in csvreader:
+                    if row: # Skip empty lines
+                        rows.append(row)
+            return rows, None
+        except Exception as e:
+            return [], str(e)
 
-    def prepareMail(self, row):
-        mail = MIMEMultipart()
-        mail['Subject'] = self.subject
-        mail['From'] = self.username
-        mail['To'] = row[2]
-
-        msgText = MIMEText('<b>%s</b>' % (self.message), 'html')
-        mail.attach(msgText)
-
-        with open("certificates/"+row[1]+".png", 'rb') as fp:
-            img = MIMEImage(fp.read())
-            img.add_header('Content-Disposition', 'attachment', filename= row[1]+".png")
-            mail.attach(img)
-        mail = mail.as_string()
-
-        return mail
-
-    def sendMails(self):
+    def create_certificate(self, name, template_path=None):
+        """Creates a certificate image for a given name."""
+        if template_path is None:
+            template_path = self.template_path
+            
         try:
+            img = Image.open(template_path)
+            draw = ImageDraw.Draw(img)
+            
+            # Load font
+            font = ImageFont.truetype(self.font_path, self.font_size)
+            
+            # Calculate text position to center it
+            # Using textbbox as textsize is deprecated in newer Pillow versions
+            bbox = draw.textbbox((0, 0), name, font=font)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+            
+            img_width, img_height = img.size
+            position = ((img_width - text_width) / 2, (img_height - text_height) / 2 - 60)
+            
+            draw.text(position, name, self.font_color, font=font)
+            return img, None
+        except Exception as e:
+            return None, str(e)
+
+    def save_certificate(self, img, name):
+        """Saves the certificate image to disk."""
+        try:
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
+                
+            path = os.path.join(self.output_dir, f"{name}.png")
+            img.save(path)
+            return path, None
+        except Exception as e:
+            return None, str(e)
+
+    def send_mail(self, credentials, mail_info, attachment_path):
+        """Sends a single email with attachment."""
+        try:
+            username = credentials['username']
+            password = credentials['password']
+            
+            msg = MIMEMultipart()
+            msg['Subject'] = mail_info['subject']
+            msg['From'] = username
+            msg['To'] = mail_info['to']
+
+            msgText = MIMEText(mail_info['message'], 'html')
+            msg.attach(msgText)
+
+            with open(attachment_path, 'rb') as fp:
+                img = MIMEImage(fp.read())
+                img.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path))
+                msg.attach(img)
+
+            # Using generic SMTP settings, specialized for Outlook/Office365 in this case but could be parameterized
             with smtplib.SMTP('smtp.office365.com', 587) as smtpObj:
                 smtpObj.ehlo()
                 smtpObj.starttls()
-                smtpObj.login(self.username, self.password)
-                for i in self.rows:
-                    mail = self.prepareMail(i)
-                    try:
-                        smtpObj.sendmail(self.username, i[2], mail)
-                        print("mail sended to {}".format(i[2]))
-                    except Exception as e:
-                        print(e)
-                    sleep(2)
+                smtpObj.login(username, password)
+                smtpObj.sendmail(username, mail_info['to'], msg.as_string())
+            
+            return True, None
         except Exception as e:
-            print(e)
-
-if __name__=="__main__":
-    app = App()
-    app.readCSV()
-    print("csv file OK.")
-    app.prepareCertificates()
-    print("certificates are created")
-    while True:
-        confirm = input("Send mails? (yes/no): ")
-        if confirm == "yes":
-            app.sendMails()
-            break
-        elif confirm == "no":
-            exit()
-        else:
-            print("wrong word. try again")
-    print("transaction terminated\npress any key to continue...")
-    input()
+            return False, str(e)

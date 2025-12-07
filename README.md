@@ -1,36 +1,45 @@
-# Prepare-and-Send-Certificates
-<h2>Uygulamanın Amacı ve Kullanımı</h2>
-<p>Düzenlenen eğitimlerde katılımcılara sertfika gönderilmesi için tasarlanmış bir projedir. Python dili ile PIL, smtplib ve csv modülleri kullanılarak yazılmıştır.</p>
+# Sertifika Hazırlama ve Gönderme Aracı
 
-<p>Etkinliğe katılan katılımcıların isim-soyisim ve E-posta bilgilerini içeren google formu doldurması istenir. Etkinlik sonrası, bu formdaki bilgiler csv formatında alınır ve uygulamaya verilir. Bunun yanında sertifikanın boş şablonuda tasarlanır, isimlerin yazılacağı yazı fontu ve rengi belrlenir ve uygulamaya tanımlanır. </p>
+Bu proje, etkinlik katılımcıları için toplu sertifika hazırlamak ve e-posta yoluyla göndermek amacıyla geliştirilmiş, kullanıcı dostu arayüze sahip bir masaüstü uygulamasıdır.
 
-<p>Uygulama, ilk aşamada listedeki isimler için birer sertifika hazırlar. İkinci aşamada ise, verilen onayla birlikte listedeki E-posta adreslerine ilgili sertifikaları gönderir. Bunun için, E-postaların gönderileceği mail adresi ve şifresi uygulama içinde tanımlı olmalıdır.</p>
+## Özellikler
 
-<h2>Uygulamanın İmplementasyonu</h2>
-<p>Proje Python dilinin OOP yapısı kullanılarak, iyi optimize edilmiş bir konsol uygulaması olarak geliştirilmiştir. Sınıf yapısında gerekli metotlar tanımlanmış. Main fonksiyonunda metotar çağrılarak uygulama gerçekleştirilmiştir. Bu metotlara bakacak olursak:</p>
+*   **Grafik Arayüz (GUI):** Modern ve kullanımı kolay arayüz.
+*   **Toplu Sertifika Oluşturma:** CSV dosyasından katılımcı listesini okur ve her biri için kişiselleştirilmiş sertifika oluşturur.
+*   **E-posta Gönderimi:** Oluşturulan sertifikaları katılımcıların e-posta adreslerine otomatik olarak gönderir.
+*   **Özelleştirilebilir Ayarlar:** Font, yazı rengi, yazı boyutu, e-posta konusu ve mesaj içeriği gibi ayarlar arayüz üzerinden kolayca değiştirilebilir.
+*   **Log Takibi:** İşlem durumlarını anlık olarak takip edebileceğiniz log ekranı.
 
-<ol type="2">
-  <li>__init__</li>
-  <li>readCSV</li>
-  <li>createCertificate</li>
-  <li>prepareCertificates</li>
-  <li>prepareMail</li>
-  <li>sendMails</li>
-</ol>
+## Kurulum
 
-<p><b>__init__:</b>init fonksiyonu, uygulamanın gerekli argumanları aldığı metottur. Bütün yapılandırmaları bu metot üzerinde değiştirilebilir. </p>
-<p><b>readCSV:</b> Alınan CSV dosyasını okuyup, anlamlı bir veriye dönüştüren metottur.</p>
-<p><b>createCertificate:</b> Sertifika şablonunu ve üzerine yazılacak isim bilgisini alıp, sertifikayı hazırlayan metottur.</p>
-<p><b>prepareCertificates:</b>sertifikaların kaydedileceği dizini oluşturan, readCSV metodundan gelen listeyi alıp, sırasıyla isimleri çeken ve createCertificate metoduna veren metottur.</p>
-<p><b>prepareMail:</b> Sertifikanın gönderileceği E-posta ve png dosyasını alarak maili hazırlayan metottur.</p>
-<p><b>sendMails:</b> İlgili smtp sunucusunu login olup, preparemail metodunun hazırlamış oldupu mailleri gönderen metottur.</p>
+1.  Projeyi bilgisayarınıza indirin.
+2.  Gerekli kütüphaneleri yükleyin:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-<p><b>__main__:</b> Uygulamadaki işlemlerin kontrol edildiği ana fonksiyondur.</p>
+## Kullanım
 
+1.  Uygulamayı çalıştırın:
+    ```bash
+    python app/gui.py
+    ```
+2.  **Ana İşlemler** sekmesinden:
+    *   **Katılımcı Listesi:** `list.csv` formatındaki dosyanızı seçin. (Format: ID, İsim, Email)
+    *   **Sertifika Şablonu:** Sertifika tasarımınız olan resim dosyasını (.png, .jpg) seçin.
+3.  **Ayarlar** ve **Mail Ayarları** sekmelerinden gerekli yapılandırmaları yapın.
+    *   Mail gönderimi için gönderici e-posta ve şifrenizi girin.
+4.  **Sertifikaları Hazırla** butonuna basarak sertifikaları oluşturun.
+5.  Sertifikalar oluşturulduktan sonra **Mailleri Gönder** butonu aktif olacaktır.
 
+## Dosya Yapısı
 
+*   `app/gui.py`: Uygulamanın grafik arayüzü.
+*   `app/app.py`: Arka plan işlemleri (Sertifika oluşturma, Mail gönderme mantığı).
+*   `requirements.txt`: Gerekli Python kütüphaneleri.
 
+## Gereksinimler
 
-
-
-
+*   Python 3.x
+*   customtkinter
+*   Pillow
