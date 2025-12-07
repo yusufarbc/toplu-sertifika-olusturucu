@@ -7,7 +7,7 @@ Bu proje, etkinlik katılımcıları için toplu sertifika hazırlamak ve e-post
 *   **Grafik Arayüz (GUI):** Modern ve kullanımı kolay arayüz.
 *   **Toplu Sertifika Oluşturma:** CSV dosyasından katılımcı listesini okur ve her biri için kişiselleştirilmiş sertifika oluşturur.
 *   **E-posta Gönderimi:** Oluşturulan sertifikaları katılımcıların e-posta adreslerine otomatik olarak gönderir.
-*   **Özelleştirilebilir Ayarlar:** Font, yazı rengi, yazı boyutu, e-posta konusu ve mesaj içeriği gibi ayarlar arayüz üzerinden kolayca değiştirilebilir.
+*   **Özelleştirilebilir Ayarlar:** Font, yazı rengi, yazı boyutu, e-posta konusu, mesaj içeriği ve SMTP sunucu ayarları (Gmail, Outlook vb. için) arayüz üzerinden kolayca değiştirilebilir.
 *   **Log Takibi:** İşlem durumlarını anlık olarak takip edebileceğiniz log ekranı.
 
 ## Kurulum
@@ -18,19 +18,35 @@ Bu proje, etkinlik katılımcıları için toplu sertifika hazırlamak ve e-post
     pip install -r requirements.txt
     ```
 
-## Kullanım
+## Kullanım ve Arayüz Tanıtımı
 
 1.  Uygulamayı çalıştırın:
     ```bash
     python app/gui.py
     ```
-2.  **Ana İşlemler** sekmesinden:
-    *   **Katılımcı Listesi:** `list.csv` formatındaki dosyanızı seçin. (Format: ID, İsim, Email)
-    *   **Sertifika Şablonu:** Sertifika tasarımınız olan resim dosyasını (.png, .jpg) seçin.
-3.  **Ayarlar** ve **Mail Ayarları** sekmelerinden gerekli yapılandırmaları yapın.
-    *   Mail gönderimi için gönderici e-posta ve şifrenizi girin.
-4.  **Sertifikaları Hazırla** butonuna basarak sertifikaları oluşturun.
-5.  Sertifikalar oluşturulduktan sonra **Mailleri Gönder** butonu aktif olacaktır.
+
+2.  **Ana İşlemler Sekmesi:**
+    *   **Katılımcı Listesi:** `list.csv` formatındaki dosyanızı (ID, İsim, Email) seçin.
+    *   **Sertifika Şablonu:** Tasarım dosyanızı (.png, .jpg) yükleyin.
+    *   Buradan sertifikaları oluşturabilir ve mail gönderimini başlatabilirsiniz. Tüm işlemlerin kaydını aşağıdaki log ekranından takip edebilirsiniz.
+    
+    ![Ana Ekran](media/ana_ekran.PNG)
+
+3.  **Görünüm Ayarları:**
+    *   Sertifika üzerine yazılacak ismin **fontunu**, **yazı boyutunu** ve **rengini** detaylıca ayarlayabilirsiniz.
+    *   Çıktı klasörünü değiştirebilirsiniz.
+    
+    ![Görünüm Ayarları](media/ayarlar.PNG)
+
+4.  **Mail Ayarları:**
+    *   Gönderici e-posta bilgilerinizi ve **SMTP sunucu** ayarlarını (Gmail, Outlook vb.) buradan yapılandırın.
+    *   Gönderilecek e-postanın **konusunu** ve **HTML formatındaki mesaj içeriğini** buradan düzenleyebilirsiniz.
+    
+    ![Mail Ayarları](media/mail_ayarları.PNG)
+
+5.  **İşlem Sırası:**
+    *   Önce `Sertifikaları Hazırla` butonuna basın.
+    *   İşlem tamamlandığında `Mailleri Gönder` butonu aktif olacaktır.
 
 ## Dosya Yapısı
 

@@ -12,7 +12,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("Sertifika ve Mail Gönderim Aracı")
-        self.geometry("900x700")
+        self.geometry("900x750")
         
         self.manager = CertificateManager()
         self.csv_rows = []
@@ -20,7 +20,7 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        # Tab view
+        # Sekme görünümü
         self.tabview = customtkinter.CTkTabview(self)
         self.tabview.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
         
@@ -32,7 +32,7 @@ class App(customtkinter.CTk):
         self.setup_settings_tab()
         self.setup_mail_tab()
 
-        # Log area at the bottom
+        # Alt kısımdaki log alanı
         self.log_frame = customtkinter.CTkFrame(self)
         self.log_frame.grid(row=1, column=0, padx=20, pady=(0, 20), sticky="nsew")
         self.log_frame.grid_rowconfigure(0, weight=1)
@@ -52,7 +52,7 @@ class App(customtkinter.CTk):
     def setup_main_tab(self):
         self.tab_main.grid_columnconfigure(1, weight=1)
 
-        # File Selection - CSV
+        # Dosya Seçimi - CSV
         self.label_csv = customtkinter.CTkLabel(self.tab_main, text="Katılımcı Listesi (.csv):")
         self.label_csv.grid(row=0, column=0, padx=10, pady=10, sticky="e")
         
@@ -62,7 +62,7 @@ class App(customtkinter.CTk):
         self.btn_csv = customtkinter.CTkButton(self.tab_main, text="Seç", width=60, command=self.select_csv)
         self.btn_csv.grid(row=0, column=2, padx=10, pady=10)
 
-        # File Selection - Template
+        # Dosya Seçimi - Şablon
         self.label_template = customtkinter.CTkLabel(self.tab_main, text="Sertifika Şablonu (.png):")
         self.label_template.grid(row=1, column=0, padx=10, pady=10, sticky="e")
         
@@ -73,7 +73,7 @@ class App(customtkinter.CTk):
         self.btn_template = customtkinter.CTkButton(self.tab_main, text="Seç", width=60, command=self.select_template)
         self.btn_template.grid(row=1, column=2, padx=10, pady=10)
 
-        # Action Buttons
+        # İşlem Butonları
         self.btn_create = customtkinter.CTkButton(self.tab_main, text="Sertifikaları Hazırla", command=self.start_creation_thread)
         self.btn_create.grid(row=2, column=0, columnspan=3, padx=10, pady=20, sticky="ew")
 
@@ -83,28 +83,28 @@ class App(customtkinter.CTk):
     def setup_settings_tab(self):
         self.tab_settings.grid_columnconfigure(1, weight=1)
 
-        # Output Dir
+        # Çıktı Klasörü
         self.label_output = customtkinter.CTkLabel(self.tab_settings, text="Çıktı Klasörü:")
         self.label_output.grid(row=0, column=0, padx=10, pady=10, sticky="e")
         self.entry_output = customtkinter.CTkEntry(self.tab_settings)
         self.entry_output.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
         self.entry_output.insert(0, self.manager.output_dir)
 
-        # Font Path
+        # Font Yolu
         self.label_font = customtkinter.CTkLabel(self.tab_settings, text="Font Dosyası (.ttf):")
         self.label_font.grid(row=1, column=0, padx=10, pady=10, sticky="e")
         self.entry_font = customtkinter.CTkEntry(self.tab_settings)
         self.entry_font.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
         self.entry_font.insert(0, self.manager.font_path)
 
-        # Font Size
+        # Font Boyutu
         self.label_size = customtkinter.CTkLabel(self.tab_settings, text="Font Boyutu:")
         self.label_size.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.entry_size = customtkinter.CTkEntry(self.tab_settings)
         self.entry_size.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
         self.entry_size.insert(0, str(self.manager.font_size))
         
-        # Color (RGB)
+        # Renk (RGB)
         self.label_color = customtkinter.CTkLabel(self.tab_settings, text="Yazı Rengi (R,G,B):")
         self.label_color.grid(row=3, column=0, padx=10, pady=10, sticky="e")
         self.entry_color = customtkinter.CTkEntry(self.tab_settings)
@@ -116,31 +116,45 @@ class App(customtkinter.CTk):
 
     def setup_mail_tab(self):
         self.tab_mail.grid_columnconfigure(1, weight=1)
+
+        # SMTP Sunucusu
+        self.label_smtp_server = customtkinter.CTkLabel(self.tab_mail, text="SMTP Sunucusu:")
+        self.label_smtp_server.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+        self.entry_smtp_server = customtkinter.CTkEntry(self.tab_mail)
+        self.entry_smtp_server.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+        self.entry_smtp_server.insert(0, "smtp.office365.com")
+
+        # Port
+        self.label_port = customtkinter.CTkLabel(self.tab_mail, text="Port:")
+        self.label_port.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.entry_port = customtkinter.CTkEntry(self.tab_mail)
+        self.entry_port.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
+        self.entry_port.insert(0, "587")
         
-        # Username
+        # Kullanıcı Adı
         self.label_user = customtkinter.CTkLabel(self.tab_mail, text="E-posta Adresi:")
-        self.label_user.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+        self.label_user.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.entry_user = customtkinter.CTkEntry(self.tab_mail)
-        self.entry_user.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+        self.entry_user.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
         
-        # Password
+        # Şifre
         self.label_pass = customtkinter.CTkLabel(self.tab_mail, text="Şifre:")
-        self.label_pass.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.label_pass.grid(row=3, column=0, padx=10, pady=10, sticky="e")
         self.entry_pass = customtkinter.CTkEntry(self.tab_mail, show="*")
-        self.entry_pass.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
+        self.entry_pass.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
         
-        # Subject
+        # Konu
         self.label_subject = customtkinter.CTkLabel(self.tab_mail, text="Konu:")
-        self.label_subject.grid(row=2, column=0, padx=10, pady=10, sticky="e")
+        self.label_subject.grid(row=4, column=0, padx=10, pady=10, sticky="e")
         self.entry_subject = customtkinter.CTkEntry(self.tab_mail)
-        self.entry_subject.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
+        self.entry_subject.grid(row=4, column=1, padx=10, pady=10, sticky="ew")
         self.entry_subject.insert(0, "Sertifikanız Hazır")
 
-        # Message
+        # Mesaj
         self.label_msg = customtkinter.CTkLabel(self.tab_mail, text="Mesaj (HTML):")
-        self.label_msg.grid(row=3, column=0, padx=10, pady=10, sticky="ne")
+        self.label_msg.grid(row=5, column=0, padx=10, pady=10, sticky="ne")
         self.entry_msg = customtkinter.CTkTextbox(self.tab_mail, height=100)
-        self.entry_msg.grid(row=3, column=1, padx=10, pady=10, sticky="ew")
+        self.entry_msg.grid(row=5, column=1, padx=10, pady=10, sticky="ew")
         self.entry_msg.insert("0.0", "Etkinliğimize katıldığınız için teşekkür ederiz. Sertifikanız ektedir.")
 
     def select_csv(self):
@@ -199,7 +213,7 @@ class App(customtkinter.CTk):
 
         count = 0
         for row in self.csv_rows:
-            # Assuming row[1] is the name based on the original code
+            # Satır 1: isim, Satır 2 vb. olabilir, orijinal koda göre varsayıyoruz
             if len(row) < 2:
                 continue
             
@@ -223,11 +237,17 @@ class App(customtkinter.CTk):
     def start_sending_thread(self):
         username = self.entry_user.get()
         password = self.entry_pass.get()
-        
+        smtp_server = self.entry_smtp_server.get()
+        port = self.entry_port.get()
+
         if not username or not password:
             messagebox.showwarning("Uyarı", "Lütfen mail bilgilerini girin.")
             return
-            
+        
+        if not smtp_server or not port:
+            messagebox.showwarning("Uyarı", "Lütfen SMTP sunucu bilgilerini girin.")
+            return
+
         if not self.csv_rows:
             messagebox.showwarning("Uyarı", "Lütfen önce katılımcı listesini yükleyin.")
             return
@@ -236,9 +256,9 @@ class App(customtkinter.CTk):
             return
 
         self.btn_send.configure(state="disabled")
-        threading.Thread(target=self.send_mails, args=(username, password)).start()
+        threading.Thread(target=self.send_mails, args=(username, password, smtp_server, int(port))).start()
 
-    def send_mails(self, username, password):
+    def send_mails(self, username, password, smtp_server, port):
         self.log("----------------------------------------")
         self.log("Mail gönderme işlemi başladı...")
         
@@ -248,7 +268,7 @@ class App(customtkinter.CTk):
         
         count = 0
         for row in self.csv_rows:
-            # Assuming row[1] is name, row[2] is email
+            # row[1] isim, row[2] email olduğu varsayılıyor
             if len(row) < 3:
                 continue
                 
@@ -267,7 +287,8 @@ class App(customtkinter.CTk):
             }
             
             self.log(f"GÖNDERİLİYOR: {email}...")
-            success, error = self.manager.send_mail(credentials, mail_info, cert_path)
+            # Yeni SMTP parametrelerini buraya ekliyoruz
+            success, error = self.manager.send_mail(credentials, mail_info, cert_path, smtp_server, port)
             
             if success:
                 self.log(f"BAŞARILI: {email} adresine gönderildi.")
